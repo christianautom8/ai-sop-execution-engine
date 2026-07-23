@@ -1,50 +1,62 @@
-# System Architecture
+# AI SOP Execution Engine Architecture
 
-## Workflow Overview
+## Overview
 
-The AI SOP Execution Engine automates the execution of a company's client onboarding Standard Operating Procedure (SOP).
+The AI SOP Execution Engine is an enterprise workflow automation system built with n8n.
 
-A single trigger initiates the workflow, validates the incoming data, creates operational records, generates AI insights, and notifies stakeholders.
+It automates the execution of Standard Operating Procedures (SOPs) after a new client officially becomes a customer.
+
+Instead of manually coordinating multiple departments, a single event triggers the entire onboarding workflow.
 
 ---
 
-## Workflow Flow
+## Workflow Architecture
 
-Webhook
-↓
-Validate Client
-↓
+```
+Receive New Client
+        │
+        ▼
+Normalize Client Data
+        │
+        ▼
+Required Fields Validation
+        │
+        ▼
 Generate Client ID
-↓
+        │
+        ▼
+Search Existing Client
+        │
+        ▼
 Duplicate Check
-↓
-Create Client
-↓
-Create Project
-↓
-Generate Tasks
-↓
-AI Summary
-↓
-Notifications
-↓
-Audit Log
+   ├──────────────► Duplicate Response
+   │
+   ▼
+AI Client Summary
+        │
+        ▼
+Route Client Type
+```
 
 ---
 
-## Technologies
+## Technology Stack
 
-- n8n
-- Airtable
-- Google Gemini
-- Gmail
+| Component | Technology |
+|-----------|------------|
+| Workflow Engine | n8n |
+| Database | Airtable |
+| AI | Google Gemini |
+| Trigger | Webhook |
+| Version Control | GitHub |
 
 ---
 
-## Future Modules
+## Design Principles
 
-- Finance
-- IT Provisioning
-- HR
-- Dashboard
-- KPI Reporting
+- Modular workflow architecture
+- Department-based automation
+- AI-assisted operational decisions
+- Early validation and duplicate detection
+- Structured documentation
+- Scalable enterprise design
