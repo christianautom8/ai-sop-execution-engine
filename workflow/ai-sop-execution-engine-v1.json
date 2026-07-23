@@ -1,0 +1,404 @@
+{
+  "name": "AI SOP Execution Engine",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bfbcb533-889b-49b3-a38f-c8d14d7785c7",
+              "name": "=company_name",
+              "value": "={{$json.body.company_name}}",
+              "type": "string"
+            },
+            {
+              "id": "053e4ca0-ce5d-4ce3-9f58-eb820080dee9",
+              "name": "contact_name",
+              "value": "={{ $json.body.contact_name }}",
+              "type": "string"
+            },
+            {
+              "id": "18bbb84d-26e0-4ec6-b800-d825c33a26ac",
+              "name": "email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "6a8bbe61-e365-478a-9d35-e8dca47e5242",
+              "name": "industry",
+              "value": "={{ $json.body.industry }}",
+              "type": "string"
+            },
+            {
+              "id": "49d3d53f-6fd9-4f9d-bf30-53647571d6e8",
+              "name": "service",
+              "value": "={{ $json.body.service }}",
+              "type": "string"
+            },
+            {
+              "id": "c21c2ac0-0f72-4467-af20-18b48582184f",
+              "name": "client-type",
+              "value": "={{ $json.body.client_type }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        160,
+        0
+      ],
+      "id": "2dca6fc5-c944-465f-b897-48bf24a4f597",
+      "name": "Normalize Client Data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "04af422e-8d02-4327-b6d3-0cd016c99be7",
+              "leftValue": "={{ $json.company_name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "90cf37de-d999-4c92-97e6-04429143e0cf",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        336,
+        0
+      ],
+      "id": "3898e64b-6a85-4a03-8c6a-31771121c3a9",
+      "name": "Required Fields?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const company = $input.first().json.company_name;\n\nconst prefix = company\n  .replace(/[^A-Za-z]/g, \"\")\n  .toUpperCase()\n  .substring(0, 3);\n\nconst random = Math.floor(1000 + Math.random() * 9000);\n\nreturn [{\n  json: {\n    ...$input.first().json,\n    client_id: `${prefix}-${random}`\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        544,
+        -96
+      ],
+      "id": "a4be0b5e-d545-45b0-844d-ce537235f782",
+      "name": "Generate Client ID"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appyNbvdQDmIUAZsA",
+          "mode": "list",
+          "cachedResultName": "AI SOP Execution Engine",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblA8BGjg3lJ3l3B9",
+          "mode": "list",
+          "cachedResultName": "Clients",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA/tblA8BGjg3lJ3l3B9"
+        },
+        "filterByFormula": "={Email} = \"{{ $json.email }}\"",
+        "returnAll": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        736,
+        -96
+      ],
+      "id": "d23661d1-e1a3-45da-bbf8-a0c753144c31",
+      "name": "Search Existing Client",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jWN0TKVZosAjTFRw",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4e01e9f8-feff-4037-839d-be993ff50b60",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        944,
+        -96
+      ],
+      "id": "68563788-97ea-4656-9bfd-494334b1ef85",
+      "name": "Duplicate Client"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-client",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -48,
+        0
+      ],
+      "id": "0a76f911-b610-417c-bd00-bb6025ae5759",
+      "name": "Recieve New Client",
+      "webhookId": "ec203234-73a8-4857-9fb8-d11d6ceb3537"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ad5a9145-8ec5-40ed-bc64-b587a5e12e55",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "10d57b71-e4c2-468f-8d63-065068a53e48",
+              "name": "message",
+              "value": "Client already  exists",
+              "type": "string"
+            },
+            {
+              "id": "f15a44c1-0722-4110-a452-f167c8bc28aa",
+              "name": "status",
+              "value": "duplicate",
+              "type": "string"
+            },
+            {
+              "id": "2e5e9414-334c-4f4e-b473-b07fd30189bd",
+              "name": "existing_client_id",
+              "value": "={{$json.fields[\"Client ID\"]}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1152,
+        -192
+      ],
+      "id": "8c48e64a-15cb-4804-bd3d-da3eff74aecd",
+      "name": "Duplicate Response"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        1104,
+        192
+      ],
+      "id": "0cd230be-3d8d-4018-a1a6-750c871cea30",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "sK73zM1tBkSvDxOh",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "You are an experienced Operations Manager responsible for reviewing newly signed clients before they enter the company's onboarding process.\n\nYour job is to analyze the client information and provide an operational assessment that will help the Sales, Operations, Finance, and IT departments prepare for onboarding.\n\nClient Information\n\nCompany Name: {{ $json.company_name }}\n\nContact Name: {{ $json.contact_name }}\n\nEmail: {{ $json.email }}\n\nIndustry: {{ $json.industry }}\n\nRequested Service: {{ $json.service }}\n\nClient Type: {{ $json.client_type }}\n\nInstructions:\n\n- Assess the business risk of onboarding this client.\n- Estimate the onboarding complexity.\n- Identify any missing information that may delay onboarding.\n- Recommend the next operational steps.\n- Determine the onboarding priority.\n\nReturn ONLY valid JSON matching the required schema.\n\nDo not include markdown.\nDo not include explanations.\nDo not wrap the JSON in code fences.",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1152,
+        -16
+      ],
+      "id": "eafb56d8-4bfb-4dbb-8f21-59fa116cd435",
+      "name": "AI Client Summary"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"executive_summary\": {\n      \"type\": \"string\"\n    },\n    \"business_risk\": {\n      \"type\": \"string\",\n      \"enum\": [\"Low\", \"Medium\", \"High\"]\n    },\n    \"onboarding_complexity\": {\n      \"type\": \"string\",\n      \"enum\": [\"Low\", \"Medium\", \"High\"]\n    },\n    \"missing_information\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    },\n    \"recommended_next_steps\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    },\n    \"priority_level\": {\n      \"type\": \"string\",\n      \"enum\": [\"Low\", \"Medium\", \"High\"]\n    }\n  },\n  \"required\": [\n    \"executive_summary\",\n    \"business_risk\",\n    \"onboarding_complexity\",\n    \"missing_information\",\n    \"recommended_next_steps\",\n    \"priority_level\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1328,
+        192
+      ],
+      "id": "c3a33553-d7bb-46e7-81c9-317217a771f2",
+      "name": "Structured Output Parser"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Normalize Client Data": {
+      "main": [
+        [
+          {
+            "node": "Required Fields?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Required Fields?": {
+      "main": [
+        [
+          {
+            "node": "Generate Client ID",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Generate Client ID": {
+      "main": [
+        [
+          {
+            "node": "Search Existing Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Existing Client": {
+      "main": [
+        [
+          {
+            "node": "Duplicate Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Duplicate Client": {
+      "main": [
+        [
+          {
+            "node": "Duplicate Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Client Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recieve New Client": {
+      "main": [
+        [
+          {
+            "node": "Normalize Client Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Client Summary",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Client Summary",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c618b776-0223-49b8-a979-3c3c544fc7c6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0909c3d04a5b5f9e2006fcc2323f0c42d4d50b5e15e720d4bc4df932519cab88"
+  },
+  "nodeGroups": [],
+  "id": "zm9oe87H7rKCE3fq",
+  "tags": []
+}
