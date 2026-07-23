@@ -1,41 +1,134 @@
-# 🚀 AI SOP Execution Engine
+# AI SOP Execution Engine
 
-An enterprise-grade AI-powered workflow automation system built with **n8n**, **Airtable**, **Gemini**, and **Gmail**.
+An AI-powered workflow automation system that executes a company's Standard Operating Procedures (SOPs) after a new client is signed.
 
----
-
-## 📖 Overview
-
-The AI SOP Execution Engine automates the execution of Standard Operating Procedures (SOPs) for client onboarding.
-
-Instead of manually coordinating multiple departments, a single trigger launches an automated workflow that validates client information, creates operational records, generates AI-powered summaries, and notifies the appropriate teams.
+Instead of manually coordinating multiple departments, a single event starts an automated workflow that validates client information, checks for duplicate records, generates an AI-powered operational summary, and prepares the client for onboarding.
 
 ---
 
-## ✨ Features
+## Project Overview
 
-- Automated client intake
-- Duplicate detection
-- AI-generated client summaries
+This project simulates how a business can automate its client onboarding process using n8n.
+
+The workflow begins when a new client enters the system. Before any department starts working, the workflow validates the client's information, generates a unique client ID, checks whether the client already exists, and uses Google Gemini to create an operational assessment.
+
+The long-term goal is to expand this workflow into a complete onboarding engine that coordinates Sales, Operations, Finance, IT, Notifications, and Reporting from a single trigger.
+
+---
+
+## Current Features
+
+- Receive new client data through a webhook
+- Normalize incoming client information
+- Validate required fields
+- Generate unique client IDs
+- Detect duplicate clients using Airtable
+- Generate AI-powered client summaries with Google Gemini
+- Return structured responses for duplicate records
+
+---
+
+## Planned Features
+
+- Client routing based on client type
+- CRM automation
 - Project creation
-- Airtable integration
-- Gmail notifications
+- Finance and billing setup
+- IT workspace provisioning
+- Email and notification automation
 - Audit logging
+- Reporting dashboard
+- Error handling and retry logic
 
 ---
 
-## 🛠 Tech Stack
+## Workflow Overview
 
-- n8n
-- Airtable
-- Google Gemini
-- Gmail
-- JavaScript
+Current workflow:
+
+```
+Receive New Client
+        │
+        ▼
+Normalize Client Data
+        │
+        ▼
+Required Fields Validation
+        │
+        ▼
+Generate Client ID
+        │
+        ▼
+Search Existing Client
+        │
+        ▼
+Duplicate Client?
+   ├──────────────► Duplicate Response
+   │
+   ▼
+AI Client Summary
+```
 
 ---
 
-## 🚧 Project Status
+## Tech Stack
 
-Currently under development.
+| Component | Technology |
+|----------|------------|
+| Workflow Automation | n8n |
+| Database | Airtable |
+| AI | Google Gemini |
+| Trigger | Webhook |
+| Version Control | GitHub |
 
-Version: **v0.1.0**
+---
+
+## Repository Structure
+
+```
+docs/
+    architecture.md
+    workflow-breakdown.md
+    airtable-schema.md
+    setup-guide.md
+    screenshots/
+
+workflow/
+    ai-sop-execution-engine-v1.json
+```
+
+---
+
+## Documentation
+
+Additional documentation is available inside the `docs` folder.
+
+- Architecture
+- Workflow Breakdown
+- Airtable Schema
+- Setup Guide
+
+---
+
+## Current Progress
+
+The foundation of the workflow has been completed.
+
+Completed modules:
+
+- Webhook Trigger
+- Data Normalization
+- Required Field Validation
+- Client ID Generation
+- Duplicate Detection
+- AI Client Summary
+
+The next phase focuses on department-specific automation for Sales, Operations, Finance, IT, Notifications, and Reporting.
+
+---
+
+## Purpose
+
+I built this project to strengthen my skills in workflow automation and operations. Instead of creating isolated automations, I wanted to design a workflow that reflects how different business functions can work together through a single automated process.
+
+The project is still being developed, and additional modules will be added over time as the workflow grows.
