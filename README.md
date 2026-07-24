@@ -28,17 +28,22 @@ The long-term goal is to expand this workflow into a complete onboarding engine 
 
 ---
 
-## Planned Features
+## Workflow Capabilities
 
-- Client routing based on client type
-- CRM automation
-- Project creation
-- Finance and billing setup
-- IT workspace provisioning
-- Email and notification automation
-- Audit logging
-- Reporting dashboard
-- Error handling and retry logic
+- Receive new client submissions through a webhook
+- Validate required client information
+- Generate unique client IDs
+- Detect duplicate clients using Airtable
+- Generate AI-powered client summaries with Google Gemini
+- Route clients based on their type (Enterprise, SMB, Startup)
+- Create CRM records automatically
+- Assign account managers
+- Generate onboarding timelines (Enterprise)
+- Generate onboarding checklists (Enterprise)
+- Send automated welcome emails
+- Create internal onboarding tasks
+- Log CRM activities
+- Notify the operations team (Enterprise)
 
 ---
 
