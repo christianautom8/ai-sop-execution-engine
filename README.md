@@ -2,41 +2,30 @@
 
 An AI-powered workflow automation system that executes a company's Standard Operating Procedures (SOPs) after a new client is signed.
 
-Instead of manually coordinating multiple departments, a single event starts an automated workflow that validates client information, checks for duplicate records, generates an AI-powered operational summary, and prepares the client for onboarding.
+Instead of manually coordinating multiple departments, a single event triggers an automated workflow that validates client information, detects duplicate records, generates an AI-powered operational summary, routes clients based on their onboarding requirements, and executes the appropriate onboarding process.
 
 ---
 
 ## Project Overview
 
-This project simulates how a business can automate its client onboarding process using n8n.
+This project demonstrates how businesses can automate client onboarding using n8n, Google Gemini, Airtable, and Gmail.
 
-The workflow begins when a new client enters the system. Before any department starts working, the workflow validates the client's information, generates a unique client ID, checks whether the client already exists, and uses Google Gemini to create an operational assessment.
+The workflow begins when a new client enters the system. It validates incoming information, generates a unique client ID, checks for existing records, creates an AI-powered client summary, and routes the client into different onboarding workflows based on their business type.
 
-The long-term goal is to expand this workflow into a complete onboarding engine that coordinates Sales, Operations, Finance, IT, Notifications, and Reporting from a single trigger.
+Each client type follows its own Standard Operating Procedure (SOP), allowing Enterprise, SMB, and Startup clients to receive onboarding experiences tailored to their operational requirements.
 
 ---
 
-## Current Features
+## Workflow Capabilities
 
 - Receive new client data through a webhook
 - Normalize incoming client information
 - Validate required fields
 - Generate unique client IDs
 - Detect duplicate clients using Airtable
-- Generate AI-powered client summaries with Google Gemini
-- Return structured responses for duplicate records
-
----
-
-## Workflow Capabilities
-
-- Receive new client submissions through a webhook
-- Validate required client information
-- Generate unique client IDs
-- Detect duplicate clients using Airtable
-- Generate AI-powered client summaries with Google Gemini
-- Route clients based on their type (Enterprise, SMB, Startup)
-- Create CRM records automatically
+- Generate AI-powered client summaries using Google Gemini
+- Route clients based on client type (Enterprise, SMB, Startup)
+- Automatically create CRM records
 - Assign account managers
 - Generate onboarding timelines (Enterprise)
 - Generate onboarding checklists (Enterprise)
@@ -48,8 +37,6 @@ The long-term goal is to expand this workflow into a complete onboarding engine 
 ---
 
 ## Workflow Overview
-
-Current workflow:
 
 ```
 Receive New Client
@@ -64,14 +51,20 @@ Required Fields Validation
 Generate Client ID
         │
         ▼
-Search Existing Client
+Duplicate Detection
         │
-        ▼
-Duplicate Client?
-   ├──────────────► Duplicate Response
-   │
-   ▼
-AI Client Summary
+   ┌────┴────┐
+   │         │
+Duplicate   Continue
+ Response      │
+               ▼
+      AI Client Summary
+               │
+               ▼
+      Route Client Type
+      ┌──────┼────────┐
+      │      │        │
+Enterprise   SMB   Startup
 ```
 
 ---
@@ -83,6 +76,7 @@ AI Client Summary
 | Workflow Automation | n8n |
 | Database | Airtable |
 | AI | Google Gemini |
+| Email Service | Gmail |
 | Trigger | Webhook |
 | Version Control | GitHub |
 
@@ -96,7 +90,6 @@ docs/
     workflow-breakdown.md
     airtable-schema.md
     setup-guide.md
-    screenshots/
 
 workflow/
     ai-sop-execution-engine-v1.json
@@ -106,7 +99,7 @@ workflow/
 
 ## Documentation
 
-Additional documentation is available inside the `docs` folder.
+Additional documentation is available in the `docs` folder.
 
 - Architecture
 - Workflow Breakdown
@@ -115,25 +108,31 @@ Additional documentation is available inside the `docs` folder.
 
 ---
 
-## Current Progress
+## Project Status
 
-The foundation of the workflow has been completed.
+**Version:** v1.0
 
-Completed modules:
+The initial version of the AI SOP Execution Engine has been completed.
 
-- Webhook Trigger
-- Data Normalization
-- Required Field Validation
-- Client ID Generation
-- Duplicate Detection
-- AI Client Summary
+Current implementation includes:
 
-The next phase focuses on department-specific automation for Sales, Operations, Finance, IT, Notifications, and Reporting.
+- Client intake automation
+- AI-assisted client assessment
+- Dynamic onboarding workflow routing
+- Enterprise onboarding workflow
+- SMB onboarding workflow
+- Startup onboarding workflow
+- CRM automation
+- Email notifications
+- Internal task generation
+- Activity logging
+
+Future enhancements may expand the workflow to additional business functions such as Finance, IT, Reporting, and post-onboarding automation.
 
 ---
 
 ## Purpose
 
-I built this project to strengthen my skills in workflow automation and operations. Instead of creating isolated automations, I wanted to design a workflow that reflects how different business functions can work together through a single automated process.
+I built this project to strengthen my workflow automation and operations skills by designing a business process that reflects how organizations automate client onboarding at scale.
 
-The project is still being developed, and additional modules will be added over time as the workflow grows.
+Rather than creating isolated automations, I wanted to build a workflow that combines AI, business rules, CRM automation, and operational processes into a single end-to-end onboarding system.
