@@ -5,7 +5,18 @@ An AI-powered workflow automation system that executes a company's Standard Oper
 Instead of manually coordinating multiple departments, a single event triggers an automated workflow that validates client information, detects duplicate records, generates an AI-powered operational summary, routes clients based on their onboarding requirements, and executes the appropriate onboarding process.
 
 ---
+## Workflow Overview
 
+![Workflow Overview](assets/workflow-overview.png)
+
+
+## Workflow Execution
+
+The workflow executes a complete onboarding process based on the client's type. Each execution validates the client, performs AI-assisted analysis, routes the request, updates the CRM, and completes the corresponding onboarding workflow automatically.
+
+![Workflow Execution](assets/workflow-execution.png)
+
+---
 ## Project Overview
 
 This project demonstrates how businesses can automate client onboarding using n8n, Google Gemini, Airtable, and Gmail.
@@ -35,7 +46,24 @@ Each client type follows its own Standard Operating Procedure (SOP), allowing En
 - Notify the operations team (Enterprise)
 
 ---
+## CRM Database
 
+Client records are automatically created and updated throughout the onboarding process. The CRM stores client information, assigned account managers, deal status, and onboarding progress.
+
+![CRM Database](assets/airtable-crm.png)
+
+## CRM Activity Log
+
+Every onboarding workflow creates an activity record to provide an auditable history of important actions performed during execution.
+
+![CRM Activity Log](assets/airtable-activity-log.png)
+
+## Internal Tasks
+
+The workflow automatically generates internal tasks based on the onboarding process, assigning them to the appropriate account manager with the corresponding priority level.
+
+![Internal Tasks](assets/airtable-tasks.png)
+---
 ## Workflow Overview
 
 ```
