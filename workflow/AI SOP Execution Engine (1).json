@@ -1,0 +1,2857 @@
+{
+  "name": "AI SOP Execution Engine",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bfbcb533-889b-49b3-a38f-c8d14d7785c7",
+              "name": "=company_name",
+              "value": "={{$json.body.company_name}}",
+              "type": "string"
+            },
+            {
+              "id": "053e4ca0-ce5d-4ce3-9f58-eb820080dee9",
+              "name": "contact_name",
+              "value": "={{ $json.body.contact_name }}",
+              "type": "string"
+            },
+            {
+              "id": "18bbb84d-26e0-4ec6-b800-d825c33a26ac",
+              "name": "email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "6a8bbe61-e365-478a-9d35-e8dca47e5242",
+              "name": "industry",
+              "value": "={{ $json.body.industry }}",
+              "type": "string"
+            },
+            {
+              "id": "49d3d53f-6fd9-4f9d-bf30-53647571d6e8",
+              "name": "service",
+              "value": "={{ $json.body.service }}",
+              "type": "string"
+            },
+            {
+              "id": "c21c2ac0-0f72-4467-af20-18b48582184f",
+              "name": "client-type",
+              "value": "={{ $json.body.client_type }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        160,
+        0
+      ],
+      "id": "2dca6fc5-c944-465f-b897-48bf24a4f597",
+      "name": "Normalize Client Data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "04af422e-8d02-4327-b6d3-0cd016c99be7",
+              "leftValue": "={{ $json.company_name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "90cf37de-d999-4c92-97e6-04429143e0cf",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        336,
+        0
+      ],
+      "id": "3898e64b-6a85-4a03-8c6a-31771121c3a9",
+      "name": "Required Fields?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const company = $input.first().json.company_name;\n\nconst prefix = company\n  .replace(/[^A-Za-z]/g, \"\")\n  .toUpperCase()\n  .substring(0, 3);\n\nconst random = Math.floor(1000 + Math.random() * 9000);\n\nreturn [{\n  json: {\n    ...$input.first().json,\n    client_id: `${prefix}-${random}`\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        544,
+        -96
+      ],
+      "id": "a4be0b5e-d545-45b0-844d-ce537235f782",
+      "name": "Generate Client ID"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appyNbvdQDmIUAZsA",
+          "mode": "list",
+          "cachedResultName": "AI SOP Execution Engine",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblA8BGjg3lJ3l3B9",
+          "mode": "list",
+          "cachedResultName": "Clients",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA/tblA8BGjg3lJ3l3B9"
+        },
+        "filterByFormula": "={Email} = \"{{ $json.email }}\"",
+        "returnAll": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        784,
+        -32
+      ],
+      "id": "d23661d1-e1a3-45da-bbf8-a0c753144c31",
+      "name": "Search Existing Client",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jWN0TKVZosAjTFRw",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4e01e9f8-feff-4037-839d-be993ff50b60",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        960,
+        -32
+      ],
+      "id": "68563788-97ea-4656-9bfd-494334b1ef85",
+      "name": "Duplicate Client"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-client",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -48,
+        0
+      ],
+      "id": "0a76f911-b610-417c-bd00-bb6025ae5759",
+      "name": "Recieve New Client",
+      "webhookId": "ec203234-73a8-4857-9fb8-d11d6ceb3537"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ad5a9145-8ec5-40ed-bc64-b587a5e12e55",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "10d57b71-e4c2-468f-8d63-065068a53e48",
+              "name": "message",
+              "value": "Client already  exists",
+              "type": "string"
+            },
+            {
+              "id": "f15a44c1-0722-4110-a452-f167c8bc28aa",
+              "name": "status",
+              "value": "duplicate",
+              "type": "string"
+            },
+            {
+              "id": "2e5e9414-334c-4f4e-b473-b07fd30189bd",
+              "name": "existing_client_id",
+              "value": "={{$json.fields[\"Client ID\"]}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1168,
+        -96
+      ],
+      "id": "8c48e64a-15cb-4804-bd3d-da3eff74aecd",
+      "name": "Duplicate Response"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        1152,
+        224
+      ],
+      "id": "0cd230be-3d8d-4018-a1a6-750c871cea30",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "sK73zM1tBkSvDxOh",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "You are an experienced Operations Manager responsible for reviewing newly signed clients before they enter the company's onboarding process.\n\nYour job is to analyze the client information and provide an operational assessment that will help the Sales, Operations, Finance, and IT departments prepare for onboarding.\n\nClient Information\n\nCompany Name: {{ $json.company_name }}\n\nContact Name: {{ $json.contact_name }}\n\nEmail: {{ $json.email }}\n\nIndustry: {{ $json.industry }}\n\nRequested Service: {{ $json.service }}\n\nClient Type: {{ $json.client_type }}\n\nInstructions:\n\n- Assess the business risk of onboarding this client.\n- Estimate the onboarding complexity.\n- Identify any missing information that may delay onboarding.\n- Recommend the next operational steps.\n- Determine the onboarding priority.\n\nReturn ONLY valid JSON matching the required schema.\n\nDo not include markdown.\nDo not include explanations.\nDo not wrap the JSON in code fences.",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1168,
+        48
+      ],
+      "id": "eafb56d8-4bfb-4dbb-8f21-59fa116cd435",
+      "name": "AI Client Summary"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"executive_summary\": \"The client appears ready for onboarding.\",\n  \"business_risk\": \"Low\",\n  \"onboarding_complexity\": \"Medium\",\n  \"missing_information\": [\n    \"Signed Master Service Agreement\",\n    \"Billing contact\"\n  ],\n  \"recommended_next_steps\": [\n    \"Create CRM record\",\n    \"Assign Account Manager\",\n    \"Schedule kickoff meeting\"\n  ],\n  \"priority_level\": \"Medium\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1312,
+        240
+      ],
+      "id": "c3a33553-d7bb-46e7-81c9-317217a771f2",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json[\"client-type\"] }}",
+                    "rightValue": "Enterprise",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "c5615a15-8362-475e-89ef-d90872f99a83"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Enterprise"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0b65b5c3-d6e9-4052-bf4f-25359f901588",
+                    "leftValue": "={{ $json[\"client-type\"] }}",
+                    "rightValue": "SMB",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "SMB"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "77f56655-617b-472b-8383-748c191fd8ae",
+                    "leftValue": "={{ $json[\"client-type\"] }}",
+                    "rightValue": "Startup",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Startup"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1648,
+        -256
+      ],
+      "id": "817264c3-f4dc-4afa-b137-07b33603c84c",
+      "name": "Route Client Type"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1456,
+        -240
+      ],
+      "id": "177f74b5-49dc-42ad-96d9-b62f4a8bf85b",
+      "name": "Merge Client + AI"
+    },
+    {
+      "parameters": {
+        "jsCode": "const managers = {\n  Manufacturing: \"John Santos\",\n  FinTech: \"Sarah Lee\",\n  Healthcare: \"Michael Cruz\",\n  Logistics: \"John Santos\",\n  Technology: \"Alex Johnson\"\n};\n\nconst industry = $json.fields[\"Industry\"];\n\nreturn [{\n  json: {\n    ...$json,\n    account_manager: managers[industry] || \"Unassigned\"\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2096,
+        -416
+      ],
+      "id": "1a618c97-bb52-435a-bd32-4593115e49c1",
+      "name": "Assign Account Manager"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appyNbvdQDmIUAZsA",
+          "mode": "list",
+          "cachedResultName": "AI SOP Execution Engine",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl4QbuAFbozD4kXj",
+          "mode": "list",
+          "cachedResultName": "CRM",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA/tbl4QbuAFbozD4kXj"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Client ID": "={{ $('Merge Client + AI').item.json.client_id }}",
+            "Company Name": "={{ $('Merge Client + AI').item.json.company_name }}",
+            "Contact Name": "={{ $('Merge Client + AI').item.json.contact_name }}",
+            "Email": "={{ $('Merge Client + AI').item.json.email }}",
+            "Industry": "={{ $('Merge Client + AI').item.json.industry }}",
+            "Account Manager": "Unassigned",
+            "Deal Stage": "Qualified",
+            "Status": "Open"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true
+            },
+            {
+              "id": "Client ID",
+              "displayName": "Client ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Contact Name",
+              "displayName": "Contact Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Industry",
+              "displayName": "Industry",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Account Manager",
+              "displayName": "Account Manager",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Deal Stage",
+              "displayName": "Deal Stage",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Qualified",
+                  "value": "Qualified"
+                },
+                {
+                  "name": "Onboarding",
+                  "value": "Onboarding"
+                },
+                {
+                  "name": "Active",
+                  "value": "Active"
+                },
+                {
+                  "name": "Completed",
+                  "value": "Completed"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "TImeline",
+              "displayName": "TImeline",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Open",
+                  "value": "Open"
+                },
+                {
+                  "name": "In Progress",
+                  "value": "In Progress"
+                },
+                {
+                  "name": "Closed",
+                  "value": "Closed"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Created At",
+              "displayName": "Created At",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1904,
+        -416
+      ],
+      "id": "8de06832-0b45-47ed-96e9-076471ffa1f4",
+      "name": "Create Client Record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jWN0TKVZosAjTFRw",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appyNbvdQDmIUAZsA",
+          "mode": "list",
+          "cachedResultName": "AI SOP Execution Engine",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl4QbuAFbozD4kXj",
+          "mode": "list",
+          "cachedResultName": "CRM",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA/tbl4QbuAFbozD4kXj"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Account Manager": "={{ $json.account_manager }}",
+            "Client ID": "={{ $json.fields['Client ID'] }}",
+            "Company Name": "={{ $json.fields['Company Name'] }}",
+            "Contact Name": "={{ $json.fields['Contact Name'] }}",
+            "Email": "={{ $json.fields.Email }}",
+            "Industry": "={{ $json.fields.Industry }}",
+            "Deal Stage": "={{ $json.fields['Deal Stage'] }}",
+            "Status": "={{ $json.fields.Status }}"
+          },
+          "matchingColumns": [
+            "Client ID"
+          ],
+          "schema": [
+            {
+              "id": "Client ID",
+              "displayName": "Client ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Contact Name",
+              "displayName": "Contact Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Industry",
+              "displayName": "Industry",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Account Manager",
+              "displayName": "Account Manager",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Deal Stage",
+              "displayName": "Deal Stage",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Qualified",
+                  "value": "Qualified"
+                },
+                {
+                  "name": "Onboarding",
+                  "value": "Onboarding"
+                },
+                {
+                  "name": "Active",
+                  "value": "Active"
+                },
+                {
+                  "name": "Completed",
+                  "value": "Completed"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "TImeline",
+              "displayName": "TImeline",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Open",
+                  "value": "Open"
+                },
+                {
+                  "name": "In Progress",
+                  "value": "In Progress"
+                },
+                {
+                  "name": "Closed",
+                  "value": "Closed"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Created At",
+              "displayName": "Created At",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        2288,
+        -416
+      ],
+      "id": "0fe91b6e-3b81-453d-b821-0524daa3ece8",
+      "name": "Update Account Manager",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jWN0TKVZosAjTFRw",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const timeline = [\n  {\n    day: 1,\n    task: \"Kickoff Meeting\"\n  },\n  {\n    day: 2,\n    task: \"Requirements Gathering\"\n  },\n  {\n    day: 4,\n    task: \"Solution Design\"\n  },\n  {\n    day: 7,\n    task: \"Workflow Development\"\n  },\n  {\n    day: 10,\n    task: \"Client Review\"\n  }\n];\n\nreturn [{\n  json: {\n    ...$json,\n    deal_timeline: timeline\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2480,
+        -416
+      ],
+      "id": "caabc48b-4805-45f2-a81d-d73ac9fcfd3d",
+      "name": "Create Deal Timeline"
+    },
+    {
+      "parameters": {
+        "jsCode": "const checklist = [\n  {\n    task: \"Send welcome email\",\n    status: \"Pending\"\n  },\n  {\n    task: \"Schedule kickoff meeting\",\n    status: \"Pending\"\n  },\n  {\n    task: \"Collect required documents\",\n    status: \"Pending\"\n  },\n  {\n    task: \"Set up client workspace\",\n    status: \"Pending\"\n  },\n  {\n    task: \"Begin implementation\",\n    status: \"Pending\"\n  }\n];\n\nreturn [{\n  json: {\n    ...$json,\n    onboarding_checklist: checklist\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2672,
+        -416
+      ],
+      "id": "7c4c9c51-cf63-4e90-a3df-9fab3af194e8",
+      "name": "Generate Onboarding Checklist1"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Recieve New Client').item.json.body.email }}",
+        "subject": "Welcome to Our Onboarding Process",
+        "emailType": "text",
+        "message": "=Hi {{ $json.fields['Contact Name'] }},  \n\nWelcome! We're excited to work with {{ $json.fields['Company Name'] }}.  \n\nYour onboarding process has officially started.  \n\nYour assigned Account Manager is: {{ $json.fields['Account Manager'] }}. \n\nOur team will contact you shortly to schedule the kickoff meeting.  \n\nBest regards, \nThe Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2880,
+        -416
+      ],
+      "id": "51a1fc70-d6f8-441f-88ae-be229330ad12",
+      "name": "Send Welcome Email",
+      "webhookId": "e12c5c34-6278-4b35-b9f3-4b5d0e42c049",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rFs8754BxqM5EUKZ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appyNbvdQDmIUAZsA",
+          "mode": "list",
+          "cachedResultName": "AI SOP Execution Engine",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblSH4YiMC91C4V8W",
+          "mode": "list",
+          "cachedResultName": "CRM Activity Log",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA/tblSH4YiMC91C4V8W"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Activity ID": "={{ \"ACT-\" + Date.now() }}",
+            "Client ID": "={{ $('Generate Onboarding Checklist1').item.json.fields['Client ID'] }}",
+            "Company Name": "={{ $('Generate Onboarding Checklist1').item.json.fields['Company Name'] }}",
+            "Activity": "Enterprise client created. Account manager assigned. Initial onboarding timeline generated.",
+            "Status": "Completed"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Activity ID",
+              "displayName": "Activity ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Client ID",
+              "displayName": "Client ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Activity",
+              "displayName": "Activity",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Qualified",
+                  "value": "Qualified"
+                },
+                {
+                  "name": "Onboarding",
+                  "value": "Onboarding"
+                },
+                {
+                  "name": "Active",
+                  "value": "Active"
+                },
+                {
+                  "name": "Completed",
+                  "value": "Completed"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        3072,
+        -416
+      ],
+      "id": "d7fdd025-c8ad-410b-a95a-4ab41eb459ba",
+      "name": "Log CRM Activity",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jWN0TKVZosAjTFRw",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appyNbvdQDmIUAZsA",
+          "mode": "list",
+          "cachedResultName": "AI SOP Execution Engine",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblP6RNBYSJeaxIp1",
+          "mode": "list",
+          "cachedResultName": "Tasks",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA/tblP6RNBYSJeaxIp1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Task ID": "={{ \"TASK-\" + Date.now() }}",
+            "Client ID": "={{ $json.fields['Client ID'] }}",
+            "Company Name": "={{ $json.fields['Company Name'] }}",
+            "Task": "Schedule kickoff meeting with the client.",
+            "Assigned to": "={{ $('Update Account Manager').item.json.fields['Account Manager'] }}",
+            "Priority": "High",
+            "Status": "Pending"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Task ID",
+              "displayName": "Task ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Client ID",
+              "displayName": "Client ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Task",
+              "displayName": "Task",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Assigned to",
+              "displayName": "Assigned to",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "High",
+                  "value": "High"
+                },
+                {
+                  "name": "Medium",
+                  "value": "Medium"
+                },
+                {
+                  "name": "Low",
+                  "value": "Low"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Pending",
+                  "value": "Pending"
+                },
+                {
+                  "name": "In Progress",
+                  "value": "In Progress"
+                },
+                {
+                  "name": "Completed",
+                  "value": "Completed"
+                },
+                {
+                  "name": "Blocked",
+                  "value": "Blocked"
+                },
+                {
+                  "name": "Cancelled",
+                  "value": "Cancelled"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Due Date",
+              "displayName": "Due Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        3264,
+        -416
+      ],
+      "id": "7214ec21-7166-4d14-88b4-77e520dc055c",
+      "name": "Create Internal Task",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jWN0TKVZosAjTFRw",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "cvillacarlos33@gmail.com",
+        "subject": " New Enterprise Client Ready for Onboarding",
+        "emailType": "text",
+        "message": "=A new Enterprise client has been onboarded.  \n\nCompany: {{ $json.fields[\"Company Name\"] }}  \nClient ID: {{ $json.fields[\"Client ID\"] }}  \nTask: Schedule kickoff meeting.  \nPriority: High  \n\nPlease review the Tasks table and begin onboarding.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        3472,
+        -416
+      ],
+      "id": "8f66e1f7-b588-4e14-846a-5a084b64e929",
+      "name": "Notify Operations Team",
+      "webhookId": "08e05077-952a-4a27-a0c7-fc5cd1837827",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rFs8754BxqM5EUKZ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appyNbvdQDmIUAZsA",
+          "mode": "list",
+          "cachedResultName": "AI SOP Execution Engine",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl4QbuAFbozD4kXj",
+          "mode": "list",
+          "cachedResultName": "CRM",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA/tbl4QbuAFbozD4kXj"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Client ID": "={{ $('Merge Client + AI').item.json.client_id }}",
+            "Company Name": "={{ $('Merge Client + AI').item.json.company_name }}",
+            "Contact Name": "={{ $('Merge Client + AI').item.json.contact_name }}",
+            "Email": "={{ $('Merge Client + AI').item.json.email }}",
+            "Industry": "={{ $('Merge Client + AI').item.json.industry }}",
+            "Account Manager": "Unassigned",
+            "Deal Stage": "Qualified",
+            "Status": "Open"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true
+            },
+            {
+              "id": "Client ID",
+              "displayName": "Client ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Contact Name",
+              "displayName": "Contact Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Industry",
+              "displayName": "Industry",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Account Manager",
+              "displayName": "Account Manager",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Deal Stage",
+              "displayName": "Deal Stage",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Qualified",
+                  "value": "Qualified"
+                },
+                {
+                  "name": "Onboarding",
+                  "value": "Onboarding"
+                },
+                {
+                  "name": "Active",
+                  "value": "Active"
+                },
+                {
+                  "name": "Completed",
+                  "value": "Completed"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "TImeline",
+              "displayName": "TImeline",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Open",
+                  "value": "Open"
+                },
+                {
+                  "name": "In Progress",
+                  "value": "In Progress"
+                },
+                {
+                  "name": "Closed",
+                  "value": "Closed"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Created At",
+              "displayName": "Created At",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1904,
+        -240
+      ],
+      "id": "4ccca213-9b4a-4063-87a5-b76fc2dbdc37",
+      "name": "Create Client Record1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jWN0TKVZosAjTFRw",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    ...$json,\n    account_manager: \"SMB Success Team\"\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2096,
+        -240
+      ],
+      "id": "b70bb9d9-c26e-4119-b40a-020a2ea4e28c",
+      "name": "Assign Account Manager1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appyNbvdQDmIUAZsA",
+          "mode": "list",
+          "cachedResultName": "AI SOP Execution Engine",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl4QbuAFbozD4kXj",
+          "mode": "list",
+          "cachedResultName": "CRM",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA/tbl4QbuAFbozD4kXj"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Account Manager": "={{ $json.account_manager }}",
+            "Client ID": "={{ $json.fields['Client ID'] }}",
+            "Company Name": "={{ $json.fields['Company Name'] }}",
+            "Contact Name": "={{ $json.fields['Contact Name'] }}",
+            "Email": "={{ $json.fields.Email }}",
+            "Industry": "={{ $json.fields.Industry }}",
+            "Deal Stage": "={{ $json.fields['Deal Stage'] }}",
+            "Status": "={{ $json.fields.Status }}"
+          },
+          "matchingColumns": [
+            "Client ID"
+          ],
+          "schema": [
+            {
+              "id": "Client ID",
+              "displayName": "Client ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Contact Name",
+              "displayName": "Contact Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Industry",
+              "displayName": "Industry",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Account Manager",
+              "displayName": "Account Manager",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Deal Stage",
+              "displayName": "Deal Stage",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Qualified",
+                  "value": "Qualified"
+                },
+                {
+                  "name": "Onboarding",
+                  "value": "Onboarding"
+                },
+                {
+                  "name": "Active",
+                  "value": "Active"
+                },
+                {
+                  "name": "Completed",
+                  "value": "Completed"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "TImeline",
+              "displayName": "TImeline",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Open",
+                  "value": "Open"
+                },
+                {
+                  "name": "In Progress",
+                  "value": "In Progress"
+                },
+                {
+                  "name": "Closed",
+                  "value": "Closed"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Created At",
+              "displayName": "Created At",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        2288,
+        -240
+      ],
+      "id": "a9f1e0a6-8426-490e-85ed-ad2758ca9721",
+      "name": "Update Account Manager1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jWN0TKVZosAjTFRw",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Recieve New Client').item.json.body.email }}",
+        "subject": "Welcome! Your SMB Onboarding Has Started",
+        "emailType": "text",
+        "message": "=Hi {{ $json.fields['Contact Name'] }},  \n\nWelcome! We're excited to work with {{ $json.fields['Company Name'] }}.  \n\nYour onboarding process has officially started.  \n\nYour assigned Account Manager is: {{ $json.fields['Account Manager'] }}. \n\nOur team will contact you shortly to schedule the kickoff meeting.  \n\nBest regards, \nThe Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2480,
+        -240
+      ],
+      "id": "1970d29b-acc9-471d-b321-24b61d9d0b5d",
+      "name": "Send Welcome Email1",
+      "webhookId": "e12c5c34-6278-4b35-b9f3-4b5d0e42c049",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rFs8754BxqM5EUKZ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appyNbvdQDmIUAZsA",
+          "mode": "list",
+          "cachedResultName": "AI SOP Execution Engine",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblP6RNBYSJeaxIp1",
+          "mode": "list",
+          "cachedResultName": "Tasks",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA/tblP6RNBYSJeaxIp1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Task ID": "={{ \"TASK-\" + Date.now() }}",
+            "Client ID": "={{ $('Assign Account Manager1').item.json.fields['Client ID'] }}",
+            "Company Name": "={{ $('Update Account Manager1').item.json.fields['Company Name'] }}",
+            "Task": "Contact client within 1 business day.",
+            "Assigned to": "={{ $('Update Account Manager1').item.json.fields['Account Manager'] }}",
+            "Priority": "Medium",
+            "Status": "Pending"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Task ID",
+              "displayName": "Task ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Client ID",
+              "displayName": "Client ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Task",
+              "displayName": "Task",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Assigned to",
+              "displayName": "Assigned to",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "High",
+                  "value": "High"
+                },
+                {
+                  "name": "Medium",
+                  "value": "Medium"
+                },
+                {
+                  "name": "Low",
+                  "value": "Low"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Pending",
+                  "value": "Pending"
+                },
+                {
+                  "name": "In Progress",
+                  "value": "In Progress"
+                },
+                {
+                  "name": "Completed",
+                  "value": "Completed"
+                },
+                {
+                  "name": "Blocked",
+                  "value": "Blocked"
+                },
+                {
+                  "name": "Cancelled",
+                  "value": "Cancelled"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Due Date",
+              "displayName": "Due Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        2656,
+        -240
+      ],
+      "id": "b9524321-c393-4315-b7c8-2ea410ab222c",
+      "name": "Create Internal Task1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jWN0TKVZosAjTFRw",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appyNbvdQDmIUAZsA",
+          "mode": "list",
+          "cachedResultName": "AI SOP Execution Engine",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblSH4YiMC91C4V8W",
+          "mode": "list",
+          "cachedResultName": "CRM Activity Log",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA/tblSH4YiMC91C4V8W"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Activity ID": "={{ \"ACT-\" + Date.now() }}",
+            "Client ID": "={{ $json.fields['Client ID'] }}",
+            "Company Name": "={{ $json.fields['Company Name'] }}",
+            "Activity": "SMB client onboarded. Standard onboarding initiated.",
+            "Status": "Completed"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Activity ID",
+              "displayName": "Activity ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Client ID",
+              "displayName": "Client ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Activity",
+              "displayName": "Activity",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Qualified",
+                  "value": "Qualified"
+                },
+                {
+                  "name": "Onboarding",
+                  "value": "Onboarding"
+                },
+                {
+                  "name": "Active",
+                  "value": "Active"
+                },
+                {
+                  "name": "Completed",
+                  "value": "Completed"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        2832,
+        -240
+      ],
+      "id": "5815fb3b-fdd6-42d0-81a2-43f872df4aa4",
+      "name": "Log CRM Activity1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jWN0TKVZosAjTFRw",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appyNbvdQDmIUAZsA",
+          "mode": "list",
+          "cachedResultName": "AI SOP Execution Engine",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl4QbuAFbozD4kXj",
+          "mode": "list",
+          "cachedResultName": "CRM",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA/tbl4QbuAFbozD4kXj"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Client ID": "={{ $('Merge Client + AI').item.json.client_id }}",
+            "Company Name": "={{ $('Merge Client + AI').item.json.company_name }}",
+            "Contact Name": "={{ $('Merge Client + AI').item.json.contact_name }}",
+            "Email": "={{ $('Merge Client + AI').item.json.email }}",
+            "Industry": "={{ $('Merge Client + AI').item.json.industry }}",
+            "Account Manager": "Unassigned",
+            "Deal Stage": "Qualified",
+            "Status": "Open"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true
+            },
+            {
+              "id": "Client ID",
+              "displayName": "Client ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Contact Name",
+              "displayName": "Contact Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Industry",
+              "displayName": "Industry",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Account Manager",
+              "displayName": "Account Manager",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Deal Stage",
+              "displayName": "Deal Stage",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Qualified",
+                  "value": "Qualified"
+                },
+                {
+                  "name": "Onboarding",
+                  "value": "Onboarding"
+                },
+                {
+                  "name": "Active",
+                  "value": "Active"
+                },
+                {
+                  "name": "Completed",
+                  "value": "Completed"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "TImeline",
+              "displayName": "TImeline",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Open",
+                  "value": "Open"
+                },
+                {
+                  "name": "In Progress",
+                  "value": "In Progress"
+                },
+                {
+                  "name": "Closed",
+                  "value": "Closed"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Created At",
+              "displayName": "Created At",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1904,
+        -48
+      ],
+      "id": "b316950f-695a-4cde-977d-8988399b3c5b",
+      "name": "Create Client Record2",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jWN0TKVZosAjTFRw",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Recieve New Client').item.json.body.email }}",
+        "subject": "Welcome! Let's Get Started",
+        "emailType": "text",
+        "message": "=Hi {{ $('Recieve New Client').item.json.body.contact_name }},\n\nWelcome to our services!\n\nWe're excited to work with {{ $('Recieve New Client').item.json.body.company_name }}.\n\nYour onboarding has officially started, and your assigned Account Manager is:\n\n{{ $json.account_manager }}\n\nOur team will reach out soon with the next steps.\n\nIf you have any questions, simply reply to this email.\n\nBest regards,\n\nThe Customer Success Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2480,
+        -48
+      ],
+      "id": "373f2d50-b77a-43e1-9730-bf1bb6a79361",
+      "name": "Send Welcome Email2",
+      "webhookId": "e12c5c34-6278-4b35-b9f3-4b5d0e42c049",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rFs8754BxqM5EUKZ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appyNbvdQDmIUAZsA",
+          "mode": "list",
+          "cachedResultName": "AI SOP Execution Engine",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblSH4YiMC91C4V8W",
+          "mode": "list",
+          "cachedResultName": "CRM Activity Log",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA/tblSH4YiMC91C4V8W"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Activity ID": "={{ \"ACT-\" + Date.now() }}",
+            "Client ID": "={{ $('Update Account Manager2').item.json.fields['Client ID'] }}",
+            "Company Name": "={{ $('Update Account Manager2').item.json.fields['Company Name'] }}",
+            "Activity": "Startup client onboarded. Express onboarding initiated.",
+            "Status": "Completed"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Activity ID",
+              "displayName": "Activity ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Client ID",
+              "displayName": "Client ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Activity",
+              "displayName": "Activity",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Qualified",
+                  "value": "Qualified"
+                },
+                {
+                  "name": "Onboarding",
+                  "value": "Onboarding"
+                },
+                {
+                  "name": "Active",
+                  "value": "Active"
+                },
+                {
+                  "name": "Completed",
+                  "value": "Completed"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        2672,
+        -48
+      ],
+      "id": "a4c9e768-9b5d-4b10-a106-7517c8519c40",
+      "name": "Log CRM Activity2",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jWN0TKVZosAjTFRw",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    ...$json,\n    account_manager: \"Startup Success Team\"\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2096,
+        -48
+      ],
+      "id": "d5f61c6a-ebe7-4a36-affe-e4538cf6e9d4",
+      "name": "Assign Account Manager2"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appyNbvdQDmIUAZsA",
+          "mode": "list",
+          "cachedResultName": "AI SOP Execution Engine",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl4QbuAFbozD4kXj",
+          "mode": "list",
+          "cachedResultName": "CRM",
+          "cachedResultUrl": "https://airtable.com/appyNbvdQDmIUAZsA/tbl4QbuAFbozD4kXj"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Account Manager": "={{ $json.account_manager }}",
+            "Client ID": "={{ $json.fields['Client ID'] }}",
+            "Company Name": "={{ $json.fields['Company Name'] }}",
+            "Contact Name": "={{ $json.fields['Contact Name'] }}",
+            "Email": "={{ $json.fields.Email }}",
+            "Industry": "={{ $json.fields.Industry }}",
+            "Deal Stage": "={{ $json.fields['Deal Stage'] }}",
+            "Status": "={{ $json.fields.Status }}"
+          },
+          "matchingColumns": [
+            "Client ID"
+          ],
+          "schema": [
+            {
+              "id": "Client ID",
+              "displayName": "Client ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Contact Name",
+              "displayName": "Contact Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Industry",
+              "displayName": "Industry",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Account Manager",
+              "displayName": "Account Manager",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Deal Stage",
+              "displayName": "Deal Stage",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Qualified",
+                  "value": "Qualified"
+                },
+                {
+                  "name": "Onboarding",
+                  "value": "Onboarding"
+                },
+                {
+                  "name": "Active",
+                  "value": "Active"
+                },
+                {
+                  "name": "Completed",
+                  "value": "Completed"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "TImeline",
+              "displayName": "TImeline",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Open",
+                  "value": "Open"
+                },
+                {
+                  "name": "In Progress",
+                  "value": "In Progress"
+                },
+                {
+                  "name": "Closed",
+                  "value": "Closed"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Created At",
+              "displayName": "Created At",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        2304,
+        -48
+      ],
+      "id": "cb36b9cc-8b42-4b13-a29c-ccda302bd066",
+      "name": "Update Account Manager2",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jWN0TKVZosAjTFRw",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Normalize Client Data": {
+      "main": [
+        [
+          {
+            "node": "Required Fields?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Required Fields?": {
+      "main": [
+        [
+          {
+            "node": "Generate Client ID",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Generate Client ID": {
+      "main": [
+        [
+          {
+            "node": "Search Existing Client",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Client + AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Existing Client": {
+      "main": [
+        [
+          {
+            "node": "Duplicate Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Duplicate Client": {
+      "main": [
+        [
+          {
+            "node": "Duplicate Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Client Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recieve New Client": {
+      "main": [
+        [
+          {
+            "node": "Normalize Client Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Client Summary",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        []
+      ]
+    },
+    "AI Client Summary": {
+      "main": [
+        [
+          {
+            "node": "Merge Client + AI",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Client + AI": {
+      "main": [
+        [
+          {
+            "node": "Route Client Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Client Type": {
+      "main": [
+        [
+          {
+            "node": "Create Client Record",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Client Record1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Client Record2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Account Manager": {
+      "main": [
+        [
+          {
+            "node": "Update Account Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Client Record": {
+      "main": [
+        [
+          {
+            "node": "Assign Account Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Account Manager": {
+      "main": [
+        [
+          {
+            "node": "Create Deal Timeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Deal Timeline": {
+      "main": [
+        [
+          {
+            "node": "Generate Onboarding Checklist1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Onboarding Checklist1": {
+      "main": [
+        [
+          {
+            "node": "Send Welcome Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Welcome Email": {
+      "main": [
+        [
+          {
+            "node": "Log CRM Activity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log CRM Activity": {
+      "main": [
+        [
+          {
+            "node": "Create Internal Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Internal Task": {
+      "main": [
+        [
+          {
+            "node": "Notify Operations Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Client Record1": {
+      "main": [
+        [
+          {
+            "node": "Assign Account Manager1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Account Manager1": {
+      "main": [
+        [
+          {
+            "node": "Update Account Manager1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Account Manager1": {
+      "main": [
+        [
+          {
+            "node": "Send Welcome Email1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Welcome Email1": {
+      "main": [
+        [
+          {
+            "node": "Create Internal Task1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Internal Task1": {
+      "main": [
+        [
+          {
+            "node": "Log CRM Activity1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Client Record2": {
+      "main": [
+        [
+          {
+            "node": "Assign Account Manager2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Welcome Email2": {
+      "main": [
+        [
+          {
+            "node": "Log CRM Activity2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Account Manager2": {
+      "main": [
+        [
+          {
+            "node": "Update Account Manager2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Account Manager2": {
+      "main": [
+        [
+          {
+            "node": "Send Welcome Email2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ff1897cc-97f0-4685-88b3-0c16e62df82d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0909c3d04a5b5f9e2006fcc2323f0c42d4d50b5e15e720d4bc4df932519cab88"
+  },
+  "nodeGroups": [],
+  "id": "zm9oe87H7rKCE3fq",
+  "tags": []
+}
