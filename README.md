@@ -5,11 +5,6 @@ An AI-powered workflow automation system that executes a company's Standard Oper
 Instead of manually coordinating multiple departments, a single event triggers an automated workflow that validates client information, detects duplicate records, generates an AI-powered operational summary, routes clients based on their onboarding requirements, and executes the appropriate onboarding process.
 
 ---
-## Workflow Overview
-
-![Workflow Overview](assets/workflow-overview.png)
-
-
 ## Workflow Execution
 
 The workflow executes a complete onboarding process based on the client's type. Each execution validates the client, performs AI-assisted analysis, routes the request, updates the CRM, and completes the corresponding onboarding workflow automatically.
